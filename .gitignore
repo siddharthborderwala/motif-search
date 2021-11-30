@@ -1,2 +1,4 @@
 /target
 Cargo.lock
+input.txt
+output.txt

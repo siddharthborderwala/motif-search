@@ -1,0 +1,13 @@
+[package]
+name = "motif_search"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "search"
+path = "./src/search/mod.rs"
+
+
+[dependencies]
+structopt = "0.3.25"
+rand = "0.8.4"

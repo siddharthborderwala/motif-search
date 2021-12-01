@@ -2,3 +2,4 @@
 Cargo.lock
 input.txt
 output.txt
+/dist

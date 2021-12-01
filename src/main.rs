@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
+
 use structopt::StructOpt;
 
 use search::core::get_motif_matches;
@@ -14,12 +15,12 @@ use search::util::*;
 struct Opt {
     // Input file's path
     // default value is input.txt in the current directory
-    #[structopt(short, long, parse(from_os_str), default_value = "./input.txt")]
+    #[structopt(long, parse(from_os_str), default_value = "./input.txt")]
     input: PathBuf,
 
     // Output file's path
     // default value is output.txt in the current directory
-    #[structopt(short, long, parse(from_os_str), default_value = "./output.txt")]
+    #[structopt(long, parse(from_os_str), default_value = "./output.txt")]
     output: PathBuf,
 
     // The minimum edit distance
@@ -31,11 +32,11 @@ struct Opt {
     l: usize,
 
     // The indel cost
-    #[structopt(short, long = "indel", name = "indel-cost")]
+    #[structopt(short, long = "indel", name = "indel-cost", default_value = "1")]
     indel: usize,
 
     // The substitution cost
-    #[structopt(short, long = "sub", name = "substitution-cost")]
+    #[structopt(short, long = "sub", name = "substitution-cost", default_value = "2")]
     sub: usize,
 }
 
@@ -47,6 +48,7 @@ fn write_vec_to_file(path: PathBuf, input: &Vec<String>) {
 }
 
 const SIZE: usize = 600;
+const NUMS: usize = 20;
 
 fn main() {
     // get the arguments from the command line
@@ -57,8 +59,8 @@ fn main() {
     let length = opt.l;
 
     // initialize the array to store the sequences
-    let mut sequences = Vec::<String>::with_capacity(20);
-    for _ in 0..20 {
+    let mut sequences = Vec::<String>::with_capacity(NUMS);
+    for _ in 0..NUMS {
         sequences.push(generate_sequence(SIZE));
     }
     // write the sequences generated to the input file

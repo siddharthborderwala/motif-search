@@ -7,22 +7,36 @@ pub fn get_motif_matches(
     indel: usize,
     sub: usize,
 ) -> Vec<String> {
-    // TODO: implement a better version
-    let mut motif_matches = Vec::new();
-    for sequence in sequences {
-        let mut sequence_matches = Vec::new();
-        for i in 0..sequence.len() - length {
-            let motif = &sequence[i..i + length];
-            let mut motif_count = 0;
-            for j in 0..sequence.len() - length {
-                let other_motif = &sequence[j..j + length];
-                if minimum_edit_distance(motif, other_motif, indel, sub) <= distance {
-                    motif_count += 1;
+    // for each string in sequences
+    // for each substring M in string S, where length(M) = length
+    // if a neighbor M' of M occur in the rest of strings in the sequences vector
+    // then put M' in the results vector.
+    // M' is a neighbor of M if minimum_edit_distance(M, M') <= distance
+    let mut results = vec![];
+    for string in sequences {
+        for i in 0..(string.len() - length) {
+            let substring = &string[i..(i + length)];
+            for j in 0..(string.len() - length) {
+                let neighbor = &string[j..(j + length)];
+                if minimum_edit_distance(substring, neighbor, indel, sub) <= distance {
+                    results.push(neighbor.to_string());
                 }
             }
-            sequence_matches.push(motif_count);
         }
-        motif_matches.push(sequence_matches);
     }
-    return vec!["hey".to_string()];
+    results
 }
+
+// let mut motif_matches = Vec::<String>::new();
+// for sequence in sequences {
+//     for i in 0..sequence.len() - length {
+//         let motif = &sequence[i..i + length];
+//         for j in 0..sequence.len() - length {
+//             let other_motif = &sequence[j..j + length];
+//             if minimum_edit_distance(motif, other_motif, indel, sub) <= distance {
+//                 motif_matches.push(motif.to_string());
+//             }
+//         }
+//     }
+// }
+// return motif_matches;

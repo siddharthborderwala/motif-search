@@ -1,0 +1,15 @@
+rm -rf dist/
+
+echo "Cleaned up dist directory"
+
+mkdir dist
+
+cp -r src/ dist/src/
+
+echo "Copied the source code, building the binary"
+
+cargo build --release
+
+cp ./target/release/motif_search.exe ./dist/motif_search.exe
+
+echo "Done!"

@@ -67,5 +67,8 @@ fn main() {
     write_vec_to_file(opt.input, &sequences);
 
     // get the matches
-    get_motif_matches(opt.output, sequences, distance, length, opt.indel, opt.sub);
+    let res = get_motif_matches(sequences, distance, length, opt.indel, opt.sub);
+
+    // write to output file
+    write_vec_to_file(opt.output, &res);
 }

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use std::io::Write;
-use std::path::PathBuf;
+use std::ops::Deref;
+use std::sync::{Arc, Mutex};
 
 use super::util::minimum_edit_distance;
 
@@ -16,16 +16,16 @@ pub fn generate_subsequences(sequence: &str, length: usize) -> Vec<String> {
 }
 
 pub fn get_motif_matches(
-    filename: PathBuf,
     sequences: Vec<String>,
     distance: usize,
     length: usize,
     indel: usize,
     sub: usize,
-) {
+) -> Vec<String> {
     let total_sequences = sequences.len();
     let seq_clone = sequences.clone();
     let mut subsequences_map = HashMap::<String, Vec<String>>::new();
+    let results = Arc::new(Mutex::new(Vec::<String>::new()));
 
     sequences.iter().for_each(|sequence| {
         let subsequences = generate_subsequences(&sequence, length);
@@ -57,15 +57,11 @@ pub fn get_motif_matches(
             }
 
             if count_check == total_sequences - 1 {
-                let mut f = std::fs::OpenOptions::new()
-                    .write(true)
-                    .append(true)
-                    .create(true)
-                    .open(&filename)
-                    .unwrap();
-                f.write(s.as_bytes()).unwrap();
-                f.write(b"\n").unwrap();
+                let r = Arc::clone(&results);
+                r.lock().unwrap().push(s.clone());
             }
         }
     });
+
+    return results.as_ref().lock().unwrap().deref().to_vec();
 }

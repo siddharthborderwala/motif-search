@@ -24,24 +24,24 @@ pub fn minimum_edit_distance(a: &str, b: &str, indel: usize, sub: usize) -> usiz
     // sub is the cost of substitution
     let a_len = a.len();
     let b_len = b.len();
-    let mut dp = vec![vec![0; b_len + 1]; a_len + 1];
+    let mut matrix = vec![vec![0; b_len + 1]; a_len + 1];
     for i in 0..a_len + 1 {
         for j in 0..b_len + 1 {
             if i == 0 {
-                dp[i][j] = j * indel;
+                matrix[i][j] = j * indel;
             } else if j == 0 {
-                dp[i][j] = i * indel;
+                matrix[i][j] = i * indel;
             } else if a.chars().nth(i - 1) == Some(b.chars().nth(j - 1).unwrap()) {
-                dp[i][j] = dp[i - 1][j - 1];
+                matrix[i][j] = matrix[i - 1][j - 1];
             } else {
-                dp[i][j] = min(
-                    dp[i - 1][j - 1] + sub,
-                    min(dp[i - 1][j] + indel, dp[i][j - 1] + indel),
+                matrix[i][j] = min(
+                    matrix[i - 1][j - 1] + sub,
+                    min(matrix[i - 1][j] + indel, matrix[i][j - 1] + indel),
                 );
             }
         }
     }
-    return dp[a_len][b_len];
+    return matrix[a_len][b_len];
 }
 
 #[cfg(test)]

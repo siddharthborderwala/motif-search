@@ -1,42 +1,71 @@
+use std::collections::HashMap;
+use std::io::Write;
+use std::path::PathBuf;
+
 use super::util::minimum_edit_distance;
 
+use rayon::prelude::*;
+
+pub fn generate_subsequences(sequence: &str, length: usize) -> Vec<String> {
+    let l = sequence.len();
+    let mut subsequences = Vec::<String>::with_capacity(l + 1);
+    for i in 0..l - length + 1 {
+        subsequences.push(sequence[i..i + length].to_string());
+    }
+    return subsequences;
+}
+
 pub fn get_motif_matches(
+    filename: PathBuf,
     sequences: Vec<String>,
     distance: usize,
     length: usize,
     indel: usize,
     sub: usize,
-) -> Vec<String> {
-    // for each string in sequences
-    // for each substring M in string S, where length(M) = length
-    // if a neighbor M' of M occur in the rest of strings in the sequences vector
-    // then put M' in the results vector.
-    // M' is a neighbor of M if minimum_edit_distance(M, M') <= distance
-    let mut results = vec![];
-    for string in sequences {
-        for i in 0..(string.len() - length) {
-            let substring = &string[i..(i + length)];
-            for j in 0..(string.len() - length) {
-                let neighbor = &string[j..(j + length)];
-                if minimum_edit_distance(substring, neighbor, indel, sub) <= distance {
-                    results.push(neighbor.to_string());
+) {
+    let total_sequences = sequences.len();
+    let seq_clone = sequences.clone();
+    let mut subsequences_map = HashMap::<String, Vec<String>>::new();
+
+    sequences.iter().for_each(|sequence| {
+        let subsequences = generate_subsequences(&sequence, length);
+        subsequences_map.insert(sequence.clone(), subsequences);
+    });
+
+    sequences.par_iter().for_each(|sequence| {
+        let subsequences = subsequences_map.get(sequence).unwrap();
+
+        for s in subsequences {
+            let mut count_check = 0;
+            for o in seq_clone.iter() {
+                if s != o {
+                    let mut flag = false;
+                    let osubseq = subsequences_map.get(o).unwrap();
+
+                    for s2 in osubseq {
+                        if minimum_edit_distance(&s2, &s, indel, sub) <= distance {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if flag {
+                        count_check += 1;
+                    } else {
+                        break;
+                    }
                 }
             }
-        }
-    }
-    results
-}
 
-// let mut motif_matches = Vec::<String>::new();
-// for sequence in sequences {
-//     for i in 0..sequence.len() - length {
-//         let motif = &sequence[i..i + length];
-//         for j in 0..sequence.len() - length {
-//             let other_motif = &sequence[j..j + length];
-//             if minimum_edit_distance(motif, other_motif, indel, sub) <= distance {
-//                 motif_matches.push(motif.to_string());
-//             }
-//         }
-//     }
-// }
-// return motif_matches;
+            if count_check == total_sequences - 1 {
+                let mut f = std::fs::OpenOptions::new()
+                    .write(true)
+                    .append(true)
+                    .create(true)
+                    .open(&filename)
+                    .unwrap();
+                f.write(s.as_bytes()).unwrap();
+                f.write(b"\n").unwrap();
+            }
+        }
+    });
+}

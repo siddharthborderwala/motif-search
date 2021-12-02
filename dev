@@ -1,0 +1,5 @@
+rm input.txt
+
+rm output.txt
+
+cargo run --release -- -l 15 -d 5 -i 1 -s 1

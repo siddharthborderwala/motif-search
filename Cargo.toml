@@ -11,3 +11,4 @@ path = "./src/search/mod.rs"
 [dependencies]
 structopt = "0.3.25"
 rand = "0.8.4"
+rayon = "1.5.1"

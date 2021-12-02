@@ -36,7 +36,7 @@ struct Opt {
     indel: usize,
 
     // The substitution cost
-    #[structopt(short, long = "sub", name = "substitution-cost", default_value = "2")]
+    #[structopt(short, long = "sub", name = "substitution-cost", default_value = "1")]
     sub: usize,
 }
 

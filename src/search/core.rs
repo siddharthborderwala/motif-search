@@ -36,27 +36,28 @@ pub fn get_motif_matches(
         let subsequences = subsequences_map.get(sequence).unwrap();
 
         for s in subsequences {
-            let mut count_check = 0;
+            let mut count = 0;
             for o in seq_clone.iter() {
-                if s != o {
-                    let mut flag = false;
-                    let osubseq = subsequences_map.get(o).unwrap();
+                if s == o {
+                    continue;
+                }
+                let mut flag = false;
+                let other_subs = subsequences_map.get(o).unwrap();
 
-                    for s2 in osubseq {
-                        if minimum_edit_distance(&s2, &s, indel, sub) <= distance {
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if flag {
-                        count_check += 1;
-                    } else {
+                for s2 in other_subs {
+                    if minimum_edit_distance(&s2, &s, indel, sub) <= distance {
+                        flag = true;
                         break;
                     }
                 }
+                if flag {
+                    count += 1;
+                } else {
+                    break;
+                }
             }
 
-            if count_check == total_sequences - 1 {
+            if count == total_sequences - 1 {
                 let r = Arc::clone(&results);
                 r.lock().unwrap().push(s.clone());
             }

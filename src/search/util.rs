@@ -31,7 +31,7 @@ pub fn minimum_edit_distance(a: &str, b: &str, indel: usize, sub: usize) -> usiz
                 matrix[i][j] = j * indel;
             } else if j == 0 {
                 matrix[i][j] = i * indel;
-            } else if a.chars().nth(i - 1) == Some(b.chars().nth(j - 1).unwrap()) {
+            } else if a[i - 1..i] == b[j - 1..j] {
                 matrix[i][j] = matrix[i - 1][j - 1];
             } else {
                 matrix[i][j] = min(
